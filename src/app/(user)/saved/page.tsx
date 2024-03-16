@@ -9,10 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
 
 interface Photo {
   albumId: number;
@@ -29,14 +26,16 @@ interface Post {
   userId: number;
 }
 
+const localStorageAvailable = typeof window !== 'undefined';
+
 const SavedDashboard = () => {
   // Check if "photos" data exists in localStorage
-  const storedPhotos = localStorage.getItem("photos");
+  const storedPhotos = localStorageAvailable && localStorage.getItem("photos");
 
   // Parse the storedPhotos if it exists, otherwise set it to an empty array
   const photos: Photo[] = storedPhotos ? JSON.parse(storedPhotos) : [];
 
-  const storedPosts = localStorage.getItem("posts");
+  const storedPosts = localStorageAvailable && localStorage.getItem("posts");
 
   const posts: Post[] = storedPosts ? JSON.parse(storedPosts) : [];
 

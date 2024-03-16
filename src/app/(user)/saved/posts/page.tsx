@@ -1,8 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
 import { PostBodyDialog } from "@/components/PostBodyDialog";
 import { Input } from "@/components/ui/input";
 import { EmptyAlert } from "@/components/EmptyAlert";
@@ -29,6 +26,8 @@ interface Post {
   userId: number;
 }
 
+const localStorageAvailable = typeof window !== "undefined";
+
 const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -47,7 +46,7 @@ const Page = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const savedPosts = localStorage.getItem("posts");
+  const savedPosts = localStorageAvailable && localStorage.getItem("posts");
   const posts: Post[] = savedPosts ? JSON.parse(savedPosts) : [];
 
   const filteredPosts = posts?.filter((post) =>
@@ -58,17 +57,6 @@ const Page = () => {
     setSearchQuery(e.target.value);
   };
 
-  if (posts.length === 0) {
-    return (
-      <div className="flex flex-col items-center gap-5 justify-center h-[80vh]">
-        <h1>No saved posts found</h1>
-        <Link className={buttonVariants()} href="/posts">
-          Save Posts
-        </Link>
-      </div>
-    );
-  }
-
   const postsPerPage = 20; // Updated to 20 posts per page
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
@@ -77,10 +65,6 @@ const Page = () => {
   const paginate = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
-
-  if (!filteredPosts || filteredPosts.length === 0 || !currentPosts) {
-    return <EmptyAlert />;
-  }
 
   return (
     <div>
@@ -92,7 +76,15 @@ const Page = () => {
         value={searchQuery}
         onChange={handleSearchInputChange}
       />
-      {filteredPosts && filteredPosts.length > 0 ? (
+
+      {posts.length < 0 ? (
+        <div className="flex flex-col items-center gap-5 justify-center h-[80vh]">
+          <h1>No saved posts found</h1>
+          <Link className={buttonVariants()} href="/posts">
+            Save Posts
+          </Link>
+        </div>
+      ) : filteredPosts && filteredPosts.length > 0 ? (
         currentPosts.map((post) => (
           <h1 className="my-3 flex gap-5 items-center" key={post.id}>
             {post.id}){" "}

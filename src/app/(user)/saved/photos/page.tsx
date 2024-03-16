@@ -45,13 +45,15 @@ const Page = () => {
     console.log(photo);
   };
 
-  const localstorage = localStorage.getItem("photos");
+  const localStorageAvailable = typeof window !== "undefined";
+
+  const localstorage = localStorageAvailable && localStorage.getItem("photos");
   console.log("Photos from local storage", localstorage);
 
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const storedPhotos = localStorage.getItem("photos");
+  const storedPhotos = localStorageAvailable && localStorage.getItem("photos");
   const photos: Photo[] = storedPhotos ? JSON.parse(storedPhotos) : [];
 
   const filteredPhotos = photos?.filter((photo) =>

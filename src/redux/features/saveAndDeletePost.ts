@@ -8,7 +8,9 @@ interface Post {
   userId: number;
 }
 
-const initialState: Post[] = localStorage.getItem("posts")
+const localStorageAvailable = typeof window !== "undefined";
+
+const initialState: Post[] = localStorageAvailable && localStorage.getItem("posts")
   ? JSON.parse(localStorage.getItem("posts") || "[]")
   : [];
 
@@ -18,7 +20,7 @@ const postsSlice = createSlice({
   reducers: {
     addPost: (state, action: PayloadAction<Post>) => {
       state.push(action.payload);
-      localStorage.setItem("posts", JSON.stringify(state));
+      localStorageAvailable && localStorage.setItem("posts", JSON.stringify(state));
     },
     removePost: (state, action: PayloadAction<Post>) => {
       const index = state.findIndex((post) => post.id === action.payload.id);

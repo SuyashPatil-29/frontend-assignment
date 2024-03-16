@@ -7,12 +7,15 @@ interface Photo {
   url: string;
 }
 
+const localStorageAvailable = typeof window !== "undefined";
+
 // Create a slice for managing photos
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState: Photo[] = localStorage.getItem("photos")
-  ? JSON.parse(localStorage.getItem("photos") || "[]")
-  : [];
+const initialState: Photo[] =
+  localStorageAvailable && localStorage.getItem("photos")
+    ? JSON.parse(localStorage.getItem("photos") || "[]")
+    : [];
 
 const photosSlice = createSlice({
   name: "photos",
@@ -26,7 +29,8 @@ const photosSlice = createSlice({
       const index = state.findIndex((photo) => photo.id === action.payload.id);
       if (index !== -1) {
         state.splice(index, 1);
-        localStorage.setItem("photos", JSON.stringify(state));
+        localStorageAvailable &&
+          localStorage.setItem("photos", JSON.stringify(state));
       }
     },
   },

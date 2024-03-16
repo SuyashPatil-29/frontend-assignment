@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, SquarePlus } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { EmptyAlert } from "@/components/EmptyAlert";
 import { PhotoBodyDialog } from "@/components/PhotoBodyDialog";
@@ -21,6 +21,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Photo {
   albumId: number;
@@ -32,18 +33,25 @@ interface Photo {
 
 const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter(); 
 
   const handleAddPhoto = (photo: Photo) => {
     toast.success("Photo Saved", {
       description: "The photo has been saved to your library.",
-      dismissible : true
+      dismissible: true,
     });
     dispatch(addPhoto(photo));
+    router.refresh();
     console.log(photo);
   };
 
-  const localstorage = localStorage.getItem("photos");
-  console.log("Photos from local storage", localstorage);
+  const localStorageAvailable = typeof window !== "undefined";
+
+  const localstorage = localStorageAvailable && localStorage.getItem("photos");
+
+  const localStoragePhotos: Photo[] = localstorage
+    ? JSON.parse(localstorage)
+    : [];
 
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -110,12 +118,16 @@ const Page = () => {
                   {photo.title.substring(0, 20) + "..."}
                 </p>
                 <PhotoBodyDialog photo={photo} />
-                <Button
-                  className="w-[100px] p-1"
-                  onClick={() => handleAddPhoto(photo)}
-                >
-                  Save
-                </Button>
+                {localStoragePhotos.some((p) => p.id === photo.id) ? (
+                  <Check className="w-6 h-6 text-green-500" />
+                ) : (
+                  <Button
+                    className="w-[100px] p-1"
+                    onClick={() => handleAddPhoto(photo)}
+                  >
+                    Save
+                  </Button>
+                )}
               </div>
             </div>
           ))
@@ -165,7 +177,7 @@ const Page = () => {
           {/* Render the current page if it's not the first, second, or third page */}
           {currentPage > 3 &&
             currentPage <
-              Math.ceil(filteredPhotos.length / photosPerPage) - 2 && (
+            Math.ceil(filteredPhotos.length / photosPerPage) - 2 && (
               <PaginationItem key={currentPage}>
                 <PaginationLink
                   onClick={() => paginate(currentPage)}
@@ -179,10 +191,10 @@ const Page = () => {
           {/* Render ellipsis if there are pages after the current page */}
           {currentPage <
             Math.ceil(filteredPhotos.length / photosPerPage) - 3 && (
-            <PaginationItem key="ellipsis-end">
-              <PaginationEllipsis />
-            </PaginationItem>
-          )}
+              <PaginationItem key="ellipsis-end">
+                <PaginationEllipsis />
+              </PaginationItem>
+            )}
 
           {/* Render the last two pages */}
           {Array.from({ length: 2 }, (_, i) => {

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import { PostBodyDialog } from "@/components/PostBodyDialog";
 import { Input } from "@/components/ui/input";
 import { EmptyAlert } from "@/components/EmptyAlert";
@@ -20,6 +20,7 @@ import { AppDispatch } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import { addPost } from "@/redux/features/saveAndDeletePost";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Post {
   body: string;
@@ -30,6 +31,7 @@ interface Post {
 
 const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
 
   const handleAddPost = (post: Post) => {
     toast.success("Post Saved", {
@@ -37,8 +39,15 @@ const Page = () => {
       dismissible: true,
     });
     dispatch(addPost(post));
+    router.refresh();
     console.log(post);
   };
+
+  const localStorageAvailable = typeof window !== "undefined";
+  const localstorage = localStorageAvailable && localStorage.getItem("posts");
+  const localStoragePosts: Post[] = localstorage
+    ? JSON.parse(localstorage)
+    : [];
 
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -93,13 +102,17 @@ const Page = () => {
       />
       {filteredPosts && filteredPosts.length > 0 ? (
         currentPosts.map((post) => (
-          <h1 className="my-3 flex gap-5 items-center" key={post.id}>
+          <div className="my-3 flex gap-5 items-center" key={post.id}>
             {post.id}){" "}
             <div className="w-full flex items-center justify-between">
               <PostBodyDialog post={post} />{" "}
-              <Button onClick={() => handleAddPost(post)}>Save</Button>
+              {localStoragePosts.some((p) => p.id === post.id) ? (
+                <Check className="w-6 h-6 text-green-500" />
+              ) : (
+                <Button onClick={() => handleAddPost(post)}>Save</Button>
+              )}
             </div>
-          </h1>
+          </div>
         ))
       ) : (
         <EmptyAlert />
