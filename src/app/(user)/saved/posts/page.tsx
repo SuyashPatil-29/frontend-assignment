@@ -18,6 +18,7 @@ import { useDispatch } from "react-redux";
 import { removePost } from "@/redux/features/saveAndDeletePost";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Post {
   body: string;
@@ -30,6 +31,7 @@ const localStorageAvailable = typeof window !== "undefined";
 
 const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
 
   const handleAddPost = (post: Post) => {
     toast.error("Post Removed", {
@@ -37,9 +39,7 @@ const Page = () => {
       dismissible: true,
     });
     dispatch(removePost(post));
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
+    router.refresh();
     console.log(post);
   };
 
@@ -109,53 +109,19 @@ const Page = () => {
             />
           </PaginationItem>
 
-          {/* Render the first page */}
-          <PaginationItem key={1}>
-            <PaginationLink
-              onClick={() => paginate(1)}
-              isActive={1 === currentPage}
-            >
-              1
-            </PaginationLink>
-          </PaginationItem>
-
-          {/* Render the second page */}
-          <PaginationItem key={2}>
-            <PaginationLink
-              onClick={() => paginate(2)}
-              isActive={2 === currentPage}
-            >
-              2
-            </PaginationLink>
-          </PaginationItem>
-
-          {/* Render the third page */}
-          <PaginationItem key={3}>
-            <PaginationLink
-              onClick={() => paginate(3)}
-              isActive={3 === currentPage}
-            >
-              3
-            </PaginationLink>
-          </PaginationItem>
-
-          <PaginationItem>
-            <PaginationLink
-              onClick={() => paginate(4)}
-              isActive={4 === currentPage}
-            >
-              4
-            </PaginationLink>
-          </PaginationItem>
-
-          <PaginationItem>
-            <PaginationLink
-              onClick={() => paginate(5)}
-              isActive={5 === currentPage}
-            >
-              5
-            </PaginationLink>
-          </PaginationItem>
+          {/* Render page numbers */}
+          {Array.from({
+            length: Math.ceil(filteredPosts.length / postsPerPage),
+          }).map((_, index) => (
+            <PaginationItem key={index + 1}>
+              <PaginationLink
+                onClick={() => paginate(index + 1)}
+                isActive={index + 1 === currentPage}
+              >
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
 
           <PaginationItem>
             <PaginationNext

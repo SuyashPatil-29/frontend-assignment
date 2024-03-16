@@ -2,14 +2,10 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 
 interface Post {
   body: string;
@@ -33,6 +29,7 @@ export function PostBodyDialog({post}: props) {
         <DialogHeader>
           <DialogTitle>Post {post.id}</DialogTitle>
         </DialogHeader>
+        <h1 className="font-bold">Title : {post.title}</h1>
         <div className="grid gap-4 py-4">
           {post.body}
         </div>

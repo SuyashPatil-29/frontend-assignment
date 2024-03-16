@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { Check, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { PostBodyDialog } from "@/components/PostBodyDialog";
 import { Input } from "@/components/ui/input";
 import { EmptyAlert } from "@/components/EmptyAlert";
@@ -18,7 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { AppDispatch } from "@/redux/store";
 import { useDispatch } from "react-redux";
-import { addPost } from "@/redux/features/saveAndDeletePost";
+import { addPost, removePost } from "@/redux/features/saveAndDeletePost";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -39,6 +39,16 @@ const Page = () => {
       dismissible: true,
     });
     dispatch(addPost(post));
+    router.refresh();
+    console.log(post);
+  };
+
+  const handleRemovePost = (post: Post) => {
+    toast.error("Post Removed", {
+      description: "The post has been removed from your library.",
+      dismissible: true,
+    });
+    dispatch(removePost(post));
     router.refresh();
     console.log(post);
   };
@@ -86,13 +96,10 @@ const Page = () => {
     setCurrentPage(pageNumber);
   };
 
-  if (!filteredPosts || filteredPosts.length === 0 || !currentPosts) {
-    return <EmptyAlert />;
-  }
-
   return (
     <div>
-      <h1 className="my-8 font-bold text-3xl">Posts</h1>
+      <h1 className="mt-8 mb-2 font-bold text-3xl">Posts</h1>
+      <p className="mb-8 text-sm">Click on the post title to view the body</p>
       <Input
         type="text"
         className="w-full mb-8"
@@ -100,14 +107,14 @@ const Page = () => {
         value={searchQuery}
         onChange={handleSearchInputChange}
       />
-      {filteredPosts && filteredPosts.length > 0 ? (
+      {filteredPosts && filteredPosts.length > 0 && currentPosts ? (
         currentPosts.map((post) => (
           <div className="my-3 flex gap-5 items-center" key={post.id}>
             {post.id}){" "}
             <div className="w-full flex items-center justify-between">
               <PostBodyDialog post={post} />{" "}
               {localStoragePosts.some((p) => p.id === post.id) ? (
-                <Check className="w-6 h-6 text-green-500" />
+                <Button onClick={() => handleRemovePost(post)}>Remove</Button>
               ) : (
                 <Button onClick={() => handleAddPost(post)}>Save</Button>
               )}
@@ -181,7 +188,7 @@ const Page = () => {
             <PaginationNext
               onClick={() => paginate(currentPage + 1)}
               className={
-                indexOfLastPost >= filteredPosts.length ? "hidden" : ""
+                indexOfLastPost >= filteredPosts!.length ? "hidden" : ""
               }
             />
           </PaginationItem>

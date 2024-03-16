@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { Check, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { EmptyAlert } from "@/components/EmptyAlert";
 import { PhotoBodyDialog } from "@/components/PhotoBodyDialog";
@@ -16,7 +16,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Separator } from "@/components/ui/separator";
-import { addPhoto } from "@/redux/features/saveAndDeletePhoto";
+import { addPhoto, removePhoto } from "@/redux/features/saveAndDeletePhoto";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { Button } from "@/components/ui/button";
@@ -33,7 +33,7 @@ interface Photo {
 
 const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter(); 
+  const router = useRouter();
 
   const handleAddPhoto = (photo: Photo) => {
     toast.success("Photo Saved", {
@@ -41,6 +41,16 @@ const Page = () => {
       dismissible: true,
     });
     dispatch(addPhoto(photo));
+    router.refresh();
+    console.log(photo);
+  };
+
+  const handleRemovePhoto = (photo: Photo) => {
+    toast.error("Photo Removed", {
+      description: "The photo has been removed from your library.",
+      dismissible: true,
+    });
+    dispatch(removePhoto(photo));
     router.refresh();
     console.log(photo);
   };
@@ -119,7 +129,12 @@ const Page = () => {
                 </p>
                 <PhotoBodyDialog photo={photo} />
                 {localStoragePhotos.some((p) => p.id === photo.id) ? (
-                  <Check className="w-6 h-6 text-green-500" />
+                  <Button
+                    className="w-[100px] p-1"
+                    onClick={() => handleRemovePhoto(photo)}
+                  >
+                    Remove
+                  </Button>
                 ) : (
                   <Button
                     className="w-[100px] p-1"
@@ -177,7 +192,7 @@ const Page = () => {
           {/* Render the current page if it's not the first, second, or third page */}
           {currentPage > 3 &&
             currentPage <
-            Math.ceil(filteredPhotos.length / photosPerPage) - 2 && (
+              Math.ceil(filteredPhotos.length / photosPerPage) - 2 && (
               <PaginationItem key={currentPage}>
                 <PaginationLink
                   onClick={() => paginate(currentPage)}
@@ -191,15 +206,15 @@ const Page = () => {
           {/* Render ellipsis if there are pages after the current page */}
           {currentPage <
             Math.ceil(filteredPhotos.length / photosPerPage) - 3 && (
-              <PaginationItem key="ellipsis-end">
-                <PaginationEllipsis />
-              </PaginationItem>
-            )}
+            <PaginationItem key="ellipsis-end">
+              <PaginationEllipsis />
+            </PaginationItem>
+          )}
 
           {/* Render the last two pages */}
           {Array.from({ length: 2 }, (_, i) => {
             const pageNumber =
-              Math.ceil(filteredPhotos.length / photosPerPage) - (2 - i);
+              Math.ceil(filteredPhotos.length / photosPerPage) - (1 - i);
             return (
               <PaginationItem key={pageNumber}>
                 <PaginationLink

@@ -39,9 +39,7 @@ const Page = () => {
       dismissible: true,
     });
     dispatch(removePhoto(photo));
-    setTimeout(() => {
-      router.refresh();
-    }, 500);
+    router.refresh();
     console.log(photo);
   };
 
@@ -98,7 +96,7 @@ const Page = () => {
         value={searchQuery}
         onChange={handleSearchInputChange}
       />
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-4 w-full">
         {currentPhotos && currentPhotos.length > 0 ? (
           currentPhotos.map((photo, index) => (
             <div className="my-3 flex gap-5 items-center" key={photo.id}>
@@ -133,71 +131,47 @@ const Page = () => {
             />
           </PaginationItem>
 
-          {/* Render the first page */}
-          <PaginationItem key={1}>
-            <PaginationLink
-              onClick={() => paginate(1)}
-              isActive={1 === currentPage}
-            >
-              1
-            </PaginationLink>
-          </PaginationItem>
+          {/* Render page numbers */}
+          {Array.from(
+            { length: Math.ceil(filteredPhotos.length / photosPerPage) },
+            (_, i) => {
+              const pageNumber = i + 1;
+              const isEllipsisStart = currentPage > 3 && i === 1;
+              const isEllipsisEnd =
+                currentPage <
+                  Math.ceil(filteredPhotos.length / photosPerPage) - 2 &&
+                i === Math.ceil(filteredPhotos.length / photosPerPage) - 2;
 
-          {/* Render the second page */}
-          <PaginationItem key={2}>
-            <PaginationLink
-              onClick={() => paginate(2)}
-              isActive={2 === currentPage}
-            >
-              2
-            </PaginationLink>
-          </PaginationItem>
-
-          {/* Render ellipsis if there are pages before the current page */}
-          {currentPage > 3 && (
-            <PaginationItem key="ellipsis-start">
-              <PaginationEllipsis />
-            </PaginationItem>
+              if (
+                (currentPage <= 3 && i < 3) ||
+                (currentPage >=
+                  Math.ceil(filteredPhotos.length / photosPerPage) - 2 &&
+                  i >= Math.ceil(filteredPhotos.length / photosPerPage) - 3) ||
+                isEllipsisStart ||
+                isEllipsisEnd
+              ) {
+                return (
+                  <React.Fragment key={pageNumber}>
+                    {isEllipsisStart || isEllipsisEnd ? (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem>
+                        <PaginationLink
+                          onClick={() => paginate(pageNumber)}
+                          isActive={pageNumber === currentPage}
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )}
+                  </React.Fragment>
+                );
+              }
+              return null;
+            },
           )}
-
-          {/* Render the current page if it's not the first, second, or third page */}
-          {currentPage > 3 &&
-            currentPage <
-              Math.ceil(filteredPhotos.length / photosPerPage) - 2 && (
-              <PaginationItem key={currentPage}>
-                <PaginationLink
-                  onClick={() => paginate(currentPage)}
-                  isActive={true}
-                >
-                  {currentPage}
-                </PaginationLink>
-              </PaginationItem>
-            )}
-
-          {/* Render ellipsis if there are pages after the current page */}
-          {currentPage <
-            Math.ceil(filteredPhotos.length / photosPerPage) - 3 && (
-            <PaginationItem key="ellipsis-end">
-              <PaginationEllipsis />
-            </PaginationItem>
-          )}
-
-          {/* Render the last two pages */}
-          {Array.from({ length: 2 }, (_, i) => {
-            const pageNumber =
-              Math.ceil(filteredPhotos.length / photosPerPage) - (2 - i);
-            return (
-              <PaginationItem key={pageNumber}>
-                <PaginationLink
-                  href="#"
-                  onClick={() => paginate(pageNumber)}
-                  isActive={pageNumber === currentPage}
-                >
-                  {pageNumber}
-                </PaginationLink>
-              </PaginationItem>
-            );
-          })}
 
           <PaginationItem>
             <PaginationNext

@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="px-4 lg:px-6 h-14 flex items-center">
+      <header className="px-8 lg:px-6 h-14 flex items-center pt-10">
         <Link className="flex items-center justify-center" href="#">
           <MountainIcon className="h-6 w-6" />
           <span className="sr-only">Acme Inc</span>
