@@ -1,12 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit'
 import savePost from './features/saveAndDeletePost'
 import savePhoto from './features/saveAndDeletePhoto'
+import likeUnlikePhotos from './features/likeUnlikePhotos'
+import likeUnlikePosts from './features/likeUnlikePosts'
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       savePost : savePost,
-      savePhoto : savePhoto
+      savePhoto : savePhoto,
+      likeUnlikePhotos : likeUnlikePhotos,
+      likeUnlikePosts : likeUnlikePosts
     },
   })
 }

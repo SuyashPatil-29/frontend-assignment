@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Heart, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { EmptyAlert } from "@/components/EmptyAlert";
 import { PhotoBodyDialog } from "@/components/PhotoBodyDialog";
@@ -22,6 +22,7 @@ import { AppDispatch } from "@/redux/store";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { likePhoto, unlikePhoto } from "@/redux/features/likeUnlikePhotos";
 
 interface Photo {
   albumId: number;
@@ -55,14 +56,41 @@ const Page = () => {
     console.log(photo);
   };
 
+  const handleLikePhoto = (photo: Photo) => {
+    toast.success("Photo Liked", {
+      description: "The photo has been liked.",
+      dismissible: true,
+    });
+    dispatch(likePhoto(photo));
+    router.refresh();
+    console.log(photo);
+  };
+
+  const handleUnlikePhoto = (photo: Photo) => {
+    toast.error("Photo Unliked", {
+      description: "The photo has been unliked.",
+      dismissible: true,
+    });
+    dispatch(unlikePhoto(photo));
+    router.refresh();
+    console.log(photo);
+  };
+
   const localStorageAvailable = typeof window !== "undefined";
 
-  const localstorage = localStorageAvailable && localStorage.getItem("photos");
+  const storageSave = localStorageAvailable && localStorage.getItem("photos");
+  const storageLike =
+    localStorageAvailable && localStorage.getItem("liked-photos");
 
-  const localStoragePhotos: Photo[] = localstorage
-    ? JSON.parse(localstorage)
+  const localStoragePhotos: Photo[] = storageSave
+    ? JSON.parse(storageSave)
     : [];
 
+  const localStorageLikedPhotos: Photo[] = storageLike
+    ? JSON.parse(storageLike)
+    : [];
+
+  console.log("liked-photos", localStorageLikedPhotos);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { data: photos, isLoading: isLoadingPhotos } = useQuery({
@@ -110,7 +138,8 @@ const Page = () => {
 
   return (
     <div>
-      <h1 className="my-8 font-bold text-3xl">Photos</h1>
+      <h1 className="mt-8 mb-2 font-bold text-3xl">Photos</h1>
+      <p className="mb-8 text-sm">Click on the photo title to view it in full size</p>
       <Input
         type="text"
         className="w-full mb-8"
@@ -128,21 +157,32 @@ const Page = () => {
                   {photo.title.substring(0, 20) + "..."}
                 </p>
                 <PhotoBodyDialog photo={photo} />
-                {localStoragePhotos.some((p) => p.id === photo.id) ? (
-                  <Button
-                    className="w-[100px] p-1"
-                    onClick={() => handleRemovePhoto(photo)}
-                  >
-                    Remove
-                  </Button>
-                ) : (
-                  <Button
-                    className="w-[100px] p-1"
-                    onClick={() => handleAddPhoto(photo)}
-                  >
-                    Save
-                  </Button>
-                )}
+                <div className="flex gap-3 items-center">
+                  {localStorageLikedPhotos.some((p) => p.id === photo.id) ? (
+                    <div onClick={() => handleUnlikePhoto(photo)}>
+                      <Heart className="w-5 h-5 text-red-500" />
+                    </div>
+                  ) : (
+                    <div onClick={() => handleLikePhoto(photo)}>
+                      <Heart className="w-5 h-5" />
+                    </div>
+                  )}
+                  {localStoragePhotos.some((p) => p.id === photo.id) ? (
+                    <Button
+                      className="flex-1 px-3"
+                      onClick={() => handleRemovePhoto(photo)}
+                    >
+                      Remove
+                    </Button>
+                  ) : (
+                    <Button
+                      className="flex-1 px-3"
+                      onClick={() => handleAddPhoto(photo)}
+                    >
+                      Save
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           ))

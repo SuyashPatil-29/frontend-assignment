@@ -1,5 +1,11 @@
 import { SidebarLink } from "@/components/SidebarItems";
-import { CircleFadingPlus, HomeIcon, Image, StickyNote } from "lucide-react";
+import {
+  CircleFadingPlus,
+  Heart,
+  HomeIcon,
+  Image,
+  StickyNote,
+} from "lucide-react";
 
 type AdditionalLinks = {
   title: string;
@@ -11,6 +17,7 @@ export const defaultLinks: SidebarLink[] = [
   { href: "/photos", title: "Photos", icon: Image },
   { href: "/posts", title: "Posts", icon: StickyNote },
   { href: "/saved", title: "Saved", icon: CircleFadingPlus },
+  { href: "/liked", title: "Liked", icon: Heart },
 ];
 
 export const additionalLinks: AdditionalLinks[] = [];

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Heart, Loader2 } from "lucide-react";
 import { PostBodyDialog } from "@/components/PostBodyDialog";
 import { Input } from "@/components/ui/input";
 import { EmptyAlert } from "@/components/EmptyAlert";
@@ -21,6 +21,7 @@ import { useDispatch } from "react-redux";
 import { addPost, removePost } from "@/redux/features/saveAndDeletePost";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { likePost, unlikePost } from "@/redux/features/likeUnlikePosts";
 
 interface Post {
   body: string;
@@ -53,12 +54,38 @@ const Page = () => {
     console.log(post);
   };
 
+  const handleLikePost = (post: Post) => {
+    toast.success("Post Liked", {
+      description: "The post has been liked.",
+      dismissible: true,
+    });
+    dispatch(likePost(post));
+    router.refresh();
+    console.log(post);
+  };
+
+  const handleUnlikePost = (post: Post) => {
+    toast.error("Post Unliked", {
+      description: "The post has been unliked.",
+      dismissible: true,
+    });
+    dispatch(unlikePost(post));
+    router.refresh();
+    console.log(post);
+  };
+
   const localStorageAvailable = typeof window !== "undefined";
   const localstorage = localStorageAvailable && localStorage.getItem("posts");
   const localStoragePosts: Post[] = localstorage
     ? JSON.parse(localstorage)
     : [];
 
+  const likedPosts =
+    localStorageAvailable && localStorage.getItem("likedPosts");
+  const localStorageLikedPosts: Post[] = likedPosts
+    ? JSON.parse(likedPosts)
+    : [];
+  console.log(localStorageLikedPosts);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { data: posts, isLoading: isLoadingPosts } = useQuery({
@@ -113,11 +140,22 @@ const Page = () => {
             {post.id}){" "}
             <div className="w-full flex items-center justify-between">
               <PostBodyDialog post={post} />{" "}
-              {localStoragePosts.some((p) => p.id === post.id) ? (
-                <Button onClick={() => handleRemovePost(post)}>Remove</Button>
-              ) : (
-                <Button onClick={() => handleAddPost(post)}>Save</Button>
-              )}
+              <div className="flex gap-3 items-center justify-end">
+                {localStorageLikedPosts.some((p) => p.id === post.id) ? (
+                  <div onClick={() => handleUnlikePost(post)}>
+                    <Heart className="w-5 h-5 text-red-500" />
+                  </div>
+                ) : (
+                  <div onClick={() => handleLikePost(post)}>
+                    <Heart className="w-5 h-5" />
+                  </div>
+                )}
+                {localStoragePosts.some((p) => p.id === post.id) ? (
+                  <Button onClick={() => handleRemovePost(post)}>Remove</Button>
+                ) : (
+                  <Button onClick={() => handleAddPost(post)}>Save</Button>
+                )}
+              </div>
             </div>
           </div>
         ))

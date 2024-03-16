@@ -1,4 +1,3 @@
-// store/postsSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface Post {
@@ -6,13 +5,15 @@ interface Post {
   id: number;
   title: string;
   userId: number;
+  liked?: boolean; // Add liked field to the Post interface
 }
 
 const localStorageAvailable = typeof window !== "undefined";
 
-const initialState: Post[] = localStorageAvailable && localStorage.getItem("posts")
-  ? JSON.parse(localStorage.getItem("posts") || "[]")
-  : [];
+const initialState: Post[] =
+  localStorageAvailable && localStorage.getItem("posts")
+    ? JSON.parse(localStorage.getItem("posts") || "[]")
+    : [];
 
 const postsSlice = createSlice({
   name: "posts",
@@ -20,7 +21,8 @@ const postsSlice = createSlice({
   reducers: {
     addPost: (state, action: PayloadAction<Post>) => {
       state.push(action.payload);
-      localStorageAvailable && localStorage.setItem("posts", JSON.stringify(state));
+      localStorageAvailable &&
+        localStorage.setItem("posts", JSON.stringify(state));
     },
     removePost: (state, action: PayloadAction<Post>) => {
       const index = state.findIndex((post) => post.id === action.payload.id);

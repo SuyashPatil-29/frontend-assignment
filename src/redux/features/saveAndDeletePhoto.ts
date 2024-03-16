@@ -5,6 +5,7 @@ interface Photo {
   thumbnailUrl: string;
   title: string;
   url: string;
+  liked?: boolean; // Add liked field to the Photo interface
 }
 
 const localStorageAvailable = typeof window !== "undefined";
