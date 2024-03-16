@@ -55,7 +55,7 @@ const SavedDashboard = () => {
             <CardContent className="flex gap-4">
               {photos.length > 0 ? (
                 photos?.slice(0, 7).map((photo) => (
-                  <Card className="group">
+                  <Card className="group" key={photo.id}>
                     <Image
                       src={photo.thumbnailUrl}
                       width={100}
@@ -88,7 +88,7 @@ const SavedDashboard = () => {
               {posts.length > 0 ? (
                 <div className="flex gap-4">
                   {posts?.slice(0, 5).map((post) => (
-                    <Card className="md:p-4 p-3">
+                    <Card className="md:p-4 p-3" key={post.id}>
                       <p>{post.title.slice(0, 22) + "..."}</p>
                     </Card>
                   ))}

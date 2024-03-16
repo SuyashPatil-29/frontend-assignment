@@ -66,7 +66,7 @@ const DashboardPage = () => {
             </CardHeader>
             <CardContent className="flex gap-4 group">
               {!isLoadingPhotos && photos ? photos?.slice(0, 7).map((photo) => (
-                <Card>
+                <Card key={photo.id}>
                   <Image
                     src={photo.thumbnailUrl}
                     width={100}
@@ -96,7 +96,7 @@ const DashboardPage = () => {
               {!isLoadingPosts && posts ? (
                 <div className="flex gap-4">
                   {posts?.slice(0, 5).map((post) => (
-                    <Card className="md:p-4 p-3 group">
+                    <Card key={post.id} className="md:p-4 p-3 group">
                       <p>{post.title.slice(0, 22) + "..." }</p>
                     </Card>
                   ))}
