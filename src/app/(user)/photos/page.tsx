@@ -139,7 +139,7 @@ const Page = () => {
   return (
     <div>
       <h1 className="mt-8 mb-2 font-bold text-3xl">Photos</h1>
-      <p className="mb-8 text-sm">Click on the photo title to view it in full size</p>
+      <p className="mb-8 text-sm">Click on the photo thumbnail to view it in full size</p>
       <Input
         type="text"
         className="w-full mb-8"

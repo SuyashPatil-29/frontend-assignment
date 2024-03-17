@@ -16,8 +16,8 @@ export const defaultLinks: SidebarLink[] = [
   { href: "/dashboard", title: "Dashboard", icon: HomeIcon },
   { href: "/photos", title: "Photos", icon: Image },
   { href: "/posts", title: "Posts", icon: StickyNote },
-  { href: "/saved", title: "Saved", icon: CircleFadingPlus },
   { href: "/liked", title: "Liked", icon: Heart },
+  { href: "/saved", title: "Saved", icon: CircleFadingPlus },
 ];
 
 export const additionalLinks: AdditionalLinks[] = [];
